@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Escenario VR</title>
+</head>
+<body>
+ 
+<canvas id="myCanvas"></canvas>
+ 
+<!-- IMPORTMAP corregido según PDF -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "./js/three.module.js",
+    "three/VRButton": "./js/VRButton.js"
+  }
+}
+</script>
+ 
+<script type="module">
+ 
+// 👉 Mandar llamar a librerías
+import * as THREE from 'three';
+import { VRButton } from 'three/VRButton';
+//import { RoundedBoxGeometry } from "./js/RoundedBoxGeometry.js";
+ 
+// 🕹️ RENDERER
+var renderer = new THREE.WebGLRenderer({canvas:
+document.getElementById('myCanvas'),antialias: true});
+renderer.setPixelRatio(window.decivePixelRatio);
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(0x85929E);
+renderer.xr.enabled =true;///////////////////////////////////////////////////////////// Añadir estas Dos lineas
+renderer.xr.setReferenceSpaceType( 'local');/////////////////////////////////////////// Para habilitar el VR
+document.body.appendChild( renderer.domElement
+);///////////////////////////////////////// Añadir estas Dos lineas
+document.body.appendChild( VRButton.createButton( renderer )
+);/////////////////////////// PAra habilitar el boton en el navegador
+
+ 
+// 🎬 ESCENA
+var scene = new THREE.Scene();
+ 
+//  CÁMARA 
+var camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight,  0.1, 2000);
+scene.add(camera);
+ 
+//  Redimensionar
+window.addEventListener('resize', () => {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+});
+ 
+//posicion de camara
+camera.position.set(0,3, 28);
+ 
+//  LUZ
+var light1 = new THREE.DirectionalLight(0xffffff, 0.8);
+light1.position.set(0, 20, 50);
+scene.add(light1);
+
+//fondo
+//  Fondo
+const loader = new THREE.TextureLoader();
+scene.background = loader.load('./assets/fondo.png');
+ 
+//  BASE
+var geometry10 = new THREE.BoxGeometry(50, 0.1, 50);
+var material10 = new THREE.MeshLambertMaterial({map: loader.load('./assets/piso1.jpg') });
+var mesh10 = new THREE.Mesh(geometry10, material10);
+mesh10.position.set(0, 0, 0);
+scene.add(mesh10);
+ 
+//  FUNCIÓN SANTA
+function santa({x, y, z}) {
+ 
+  const rojo = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+  const blanco = new THREE.MeshStandardMaterial({ color: 0xffffff });
+  const piel = new THREE.MeshStandardMaterial({ color: 0xffd7b5 });
+  const negro = new THREE.MeshStandardMaterial({ color: 0x000000 });
+  const narizRoja = new THREE.MeshStandardMaterial({ color: 0xff4444 });
+ 
+  // BARBA
+  const barbaGeo = new THREE.SphereGeometry(1.5, 16, 16);
+  const barba = new THREE.Mesh(barbaGeo, blanco);
+  barba.position.set(0, 5.5, 1);
+ 
+  // CABEZA
+  const cabezaGeo = new THREE.SphereGeometry(1.8, 16, 16);
+  const cabeza = new THREE.Mesh(cabezaGeo, piel);
+  cabeza.position.set(0, 7, 0);
+ 
+  // NARIZ
+  const narizGeo = new THREE.SphereGeometry(0.4, 12, 12);
+  const nariz = new THREE.Mesh(narizGeo, narizRoja);
+  nariz.position.set(0, 7, 1.5);
+ 
+  // OJOS
+  const ojoGeo = new THREE.SphereGeometry(0.25, 12, 12);
+  const ojoIzq = new THREE.Mesh(ojoGeo, negro);
+  const ojoDer = new THREE.Mesh(ojoGeo, negro);
+  ojoIzq.position.set(-0.45, 7.5, 1.5);
+  ojoDer.position.set(0.45, 7.5, 1.5);
+ 
+  // CEJAS
+  const cejaGeo = new THREE.BoxGeometry(0.7, 0.15, 0.15);
+  const cejaIzq = new THREE.Mesh(cejaGeo, blanco);
+  const cejaDer = new THREE.Mesh(cejaGeo, blanco);
+  cejaIzq.position.set(-0.45, 8, 1.5);
+  cejaDer.position.set(0.45, 8, 1.5);
+  cejaIzq.rotation.z = 0.2;
+  cejaDer.rotation.z = -0.2;
+ 
+  // LENTES
+  const aroGeo = new THREE.RingGeometry(0.35, 0.5, 12);
+  const aroIzq = new THREE.Mesh(aroGeo, negro);
+  const aroDer = new THREE.Mesh(aroGeo, negro);
+  aroIzq.position.set(-0.6, 7.5, 1.8);
+  aroDer.position.set(0.6, 7.5, 1.8);
+  aroIzq.rotation.z = 1.57;
+  aroDer.rotation.z = 1.57;
+ 
+  const puenteGeo = new THREE.BoxGeometry(0.6, 0.1, 0.1);
+  const puente = new THREE.Mesh(puenteGeo, negro);
+  puente.position.set(0, 7.5, 1.8);
+ 
+  // BIGOTE
+  const bigoteGeo = new THREE.SphereGeometry(0.6, 12, 12);
+  const bigoteIzq = new THREE.Mesh(bigoteGeo, blanco);
+  const bigoteDer = new THREE.Mesh(bigoteGeo, blanco);
+  bigoteIzq.scale.set(1.3, 0.6, 1);
+  bigoteDer.scale.set(1.3, 0.6, 1);
+  bigoteIzq.position.set(-0.5, 7, 1.2);
+  bigoteDer.position.set(0.5, 7, 1.2);
+  bigoteIzq.rotation.z = 0.35;
+  bigoteDer.rotation.z = -0.35;
+ 
+  // GORRO
+  const gorroGeo = new THREE.ConeGeometry(1.5, 2.5, 8);
+  const gorro = new THREE.Mesh(gorroGeo, rojo);
+  gorro.position.set(0, 9.5, 0);
+ 
+  const pompGeo = new THREE.SphereGeometry(0.4, 12, 12);
+  const pompon = new THREE.Mesh(pompGeo, blanco);
+  pompon.position.set(0, 10.5, 0);
+  gorro.add(pompon);
+ 
+  // CUERPO
+  const cuerpoGeo = new THREE.CylinderGeometry(2, 2, 4, 12);
+  const cuerpo = new THREE.Mesh(cuerpoGeo, rojo);
+  cuerpo.position.set(0, 4, 0);
+ 
+  // CINTURÓN
+  const cinturonGeo = new THREE.BoxGeometry(4, 0.4, 4);
+  const cinturon = new THREE.Mesh(cinturonGeo, negro);
+  cinturon.position.set(0, 3, 0);
+ 
+  // HEBILLA
+  const hebillaGeo = new THREE.BoxGeometry(0.9, 0.9, 0.2);
+  const hebilla = new THREE.Mesh(hebillaGeo, blanco);
+  hebilla.position.set(0, 3, 2);
+ 
+  // BRAZOS
+  const brazoGeo = new THREE.CylinderGeometry(0.4, 0.4, 3, 8);
+  const brazoIzq2 = new THREE.Mesh(brazoGeo, rojo);
+  const brazoDer2 = new THREE.Mesh(brazoGeo, rojo);
+  brazoIzq2.position.set(2.3, 4.5, 0);
+  brazoDer2.position.set(-2.3, 4.5, 0);
+  brazoIzq2.rotation.z = 0.78;
+  brazoDer2.rotation.z = -0.78;
+ 
+  // MANOS
+  const manoGeo = new THREE.SphereGeometry(0.6, 12, 12);
+  const manoIzq = new THREE.Mesh(manoGeo, piel);
+  const manoDer = new THREE.Mesh(manoGeo, piel);
+  manoIzq.position.set(0, -1.7, 0);
+  manoDer.position.set(0, -1.7, 0);
+  brazoIzq2.add(manoIzq);
+  brazoDer2.add(manoDer);
+ 
+  // PIERNAS
+  const piernaGeo = new THREE.CylinderGeometry(0.7, 0.7, 2.5, 8);
+  const piernaIzq = new THREE.Mesh(piernaGeo, rojo);
+  const piernaDer = new THREE.Mesh(piernaGeo, rojo);
+  piernaIzq.position.set(-1, 1.5, 0);
+  piernaDer.position.set(1, 1.5, 0);
+ 
+  // BOTAS
+  const botaGeo = new THREE.BoxGeometry(1.4, 1, 2);
+  const botaIzq = new THREE.Mesh(botaGeo, negro);
+  const botaDer = new THREE.Mesh(botaGeo, negro);
+  botaIzq.position.set(-1, 0.5, 0.3);
+  botaDer.position.set(1, 0.5, 0.3);
+ 
+  // AGRUPAR
+  const santa = new THREE.Group();
+  santa.add(
+    cabeza, barba, cuerpo, cinturon, hebilla, brazoIzq2, brazoDer2,
+    gorro, piernaIzq, piernaDer, botaIzq, botaDer, nariz,
+    ojoIzq, ojoDer, cejaIzq, cejaDer, aroIzq, aroDer, puente,
+    bigoteIzq, bigoteDer
+  );
+ 
+  santa.position.set(x, y, z);
+  return santa;
+}
+
+// AGREGAR SANTA A ESCENA
+const miSanta = santa({ x: 0, y: 0, z: -20 });
+scene.add(miSanta);
+
+ //TREN
+function tren ({ x, y, z }) {
+
+    // MATERIALES
+    const rojo = new THREE.MeshLambertMaterial({ color: 0xff0000 });
+    const verde = new THREE.MeshLambertMaterial({ color: 0x0a8f0a });
+    const azul = new THREE.MeshLambertMaterial({ color: 0x2a4cff });
+    const negro = new THREE.MeshLambertMaterial({ color: 0x000000 });
+    const gris = new THREE.MeshLambertMaterial({ color: 0x666666 });
+    const humoMat = new THREE.MeshLambertMaterial({ color: 0xd8d8d8 });
+
+    // ========== LOCOMOTORA ==============
+
+    // Cabina
+    const cabina = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10), rojo);
+    cabina.position.set(-1, 5, 0);
+
+    // Cuerpo de enfrente
+    const cuerpo = new THREE.Mesh(new THREE.BoxGeometry(18, 6, 8), verde);
+    cuerpo.position.set(14, 3, 0);
+
+    // Chimenea
+    const chimenea = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 8, 16), negro);
+    chimenea.position.set(-3, 12, -2);
+
+    // Faro
+    const faro = new THREE.Mesh(
+        new THREE.SphereGeometry(2, 16, 16),
+        new THREE.MeshLambertMaterial({ color: 0xffff00 })
+    );
+    faro.position.set(-5, 6, 0);
+
+    // Ruedas locomotora
+    const ruedaGeo = new THREE.CylinderGeometry(3, 3, 2, 16);
+
+    const r1 = new THREE.Mesh(ruedaGeo, gris);
+    const r2 = new THREE.Mesh(ruedaGeo, gris);
+    const r3 = new THREE.Mesh(ruedaGeo, gris);
+    const r4 = new THREE.Mesh(ruedaGeo, gris);
+
+    r1.position.set(-4, 1, 5);
+    r1.rotation.x = 55;
+
+    r2.position.set(-4, 1, -5);
+    r2.rotation.x = 55;
+
+    r3.position.set(10, 1, 5);
+    r3.rotation.x = 55;
+
+    r4.position.set(10, 1, -5);
+    r4.rotation.x = 55;
+
+    // Humo
+    const humo1 = new THREE.Mesh(new THREE.SphereGeometry(2.5, 16, 16), humoMat);
+    const humo2 = new THREE.Mesh(new THREE.SphereGeometry(2, 16, 16), humoMat);
+    const humo3 = new THREE.Mesh(new THREE.SphereGeometry(1.5, 16, 16), humoMat);
+
+    humo1.position.set(-2, 18, -2);
+    humo2.position.set(-1, 22, -2);
+    humo3.position.set(0, 26, -2);
+
+    // ========== VAGÓN 1 ==============
+
+    const vagon1Cuerpo = new THREE.Mesh(new THREE.BoxGeometry(20, 8, 10), azul);
+    vagon1Cuerpo.position.set(35, 4, 0);
+
+    const vagon1R1 = new THREE.Mesh(ruedaGeo, negro);
+    const vagon1R2 = new THREE.Mesh(ruedaGeo, negro);
+    vagon1R1.rotation.x = vagon1R2.rotation.x = 55;
+
+    vagon1R1.position.set(32, 1, 5);
+     
+    vagon1R2.position.set(32, 1, -5);
+     
+
+    // ========== VAGÓN 2 ==============
+
+    const vagon2Cuerpo = new THREE.Mesh(new THREE.BoxGeometry(20, 8, 10), rojo);
+    vagon2Cuerpo.position.set(57, 4, 0);
+
+    const vagon2R1 = new THREE.Mesh(ruedaGeo, negro);
+    const vagon2R2 = new THREE.Mesh(ruedaGeo, negro);
+    vagon2R1.rotation.x = vagon2R2.rotation.x =55;
+
+    vagon2R1.position.set(57, 1, 5);
+    vagon2R2.position.set(57, 1, -5);
+
+    // Conectores
+    const con1 = new THREE.Mesh(new THREE.BoxGeometry(40, 1, 1), gris);
+    con1.position.set(18, 3, 0);
+
+    const con2 = new THREE.Mesh(new THREE.BoxGeometry(40, 1, 1), gris);
+    con2.position.set(40, 3, 0);
+
+
+    // ========== GROUP FINAL ==============
+
+    const tren = new THREE.Group();
+
+    tren.add(
+        // Locomotora
+        cabina, cuerpo, chimenea, faro,
+        r1, r2, r3, r4,
+        humo1, humo2, humo3,
+
+        // VAGÓN 1
+        vagon1Cuerpo, vagon1R1, vagon1R2,
+
+        // VAGÓN 2
+        vagon2Cuerpo, vagon2R1, vagon2R2,
+
+        // Conectores
+        con1, con2
+    );
+
+    tren.position.set(x, y, z);
+
+    return tren;
+}
+
+// AGREGAR A LA ESCENA
+const miTren = tren({ x: 10, y: 1, z: 0 });
+scene.add(miTren);
+miTren.scale.set(0.2,0.2,0.2);
+miTren.rotation.y=-11;
+
+//CASCANUECES
+function Cascanueces({ x, y, z }) {
+
+    // --- MATERIALES ---
+    const azulRey = new THREE.MeshStandardMaterial({ color: 0x002366 });
+    const amarillo = new THREE.MeshStandardMaterial({ color: 0xffd700 });
+    const piel = new THREE.MeshStandardMaterial({ color: 0xffd7b5 });
+    const negro = new THREE.MeshStandardMaterial({ color: 0x000000 });
+    const blanco = new THREE.MeshStandardMaterial({ color: 0xffffff });
+
+    // --- CABEZA ---
+    const cabezaGeo = new THREE.SphereGeometry(1.8, 16, 16);
+    const cabeza = new THREE.Mesh(cabezaGeo, piel);
+    cabeza.position.set(0, 9, 0);
+
+    // --- BARBA CUADRADA ---
+    const barbaGeo = new THREE.BoxGeometry(1.8, 0.5, 0.2);
+    const barba = new THREE.Mesh(barbaGeo, blanco);
+    barba.position.set(0, 8, 1.9);
+
+    // --- NARIZ ---
+    const narizGeo = new THREE.SphereGeometry(0.3, 12, 12);
+    const nariz = new THREE.Mesh(narizGeo, piel);
+    nariz.position.set(0, 9, 2);
+
+    // --- OJOS ---
+    const ojoGeo = new THREE.SphereGeometry(0.25, 12, 12);
+    const ojoIzq = new THREE.Mesh(ojoGeo, negro);
+    const ojoDer = new THREE.Mesh(ojoGeo, negro);
+    ojoIzq.position.set(-0.5, 9.4, 1.5);
+    ojoDer.position.set(0.5, 9.4, 1.5);
+
+    // --- BOCA / MECANISMO ---
+    const bocaGeo = new THREE.BoxGeometry(1.7, 0.1, 0.2);
+    const boca = new THREE.Mesh(bocaGeo, negro);
+    boca.position.set(0, 8, 2);
+
+        // --- BIGOTE CURVADO ---
+    const bigoteGeo = new THREE.SphereGeometry(0.6, 12, 12);
+    const bigoteIzq = new THREE.Mesh(bigoteGeo, blanco);
+    const bigoteDer = new THREE.Mesh(bigoteGeo, blanco);
+
+    bigoteIzq.scale.set(1.3, 0.6, 1);
+    bigoteDer.scale.set(1.3, 0.6, 1);
+
+    bigoteIzq.position.set(-0.5, 8.5, 2);
+    bigoteDer.position.set(0.5,8.5, 2);
+
+    // Curva suave como sonrisa
+    bigoteIzq.rotation.z = 0.35;
+    bigoteDer.rotation.z = -0.35;
+    
+
+    // --- CASCO ---
+    const cascoGeo = new THREE.CylinderGeometry(1.8, 1.8, 2.2, 12);
+    const casco = new THREE.Mesh(cascoGeo, azulRey);
+    casco.position.set(0, 11, 0);
+
+    // --- PLUMA DECORATIVA ---
+    const plumaGeo = new THREE.BoxGeometry(0.3, 2.5, 0.3);
+    const pluma = new THREE.Mesh(plumaGeo, amarillo);
+    pluma.position.set(0, 2, 1.5);
+    casco.add(pluma);
+
+    // --- TIRA AMARILLA DEL CASCO ---
+    const cintaGeo = new THREE.BoxGeometry(2.4, 0.3, 2.4);
+    const cinta = new THREE.Mesh(cintaGeo, amarillo);
+    cinta.position.set(0, 10.2, 2);
+
+    // --- CUERPO ---
+    const torsoGeo = new THREE.CylinderGeometry(2.2, 2.2, 5, 12);
+    const torso = new THREE.Mesh(torsoGeo, azulRey);
+    torso.position.set(0, 5.2, 0);
+
+    // --- BOTONES AMARILLOS ---
+    const botonGeo = new THREE.SphereGeometry(0.25, 12, 12);
+    const boton1 = new THREE.Mesh(botonGeo, amarillo);
+    const boton2 = new THREE.Mesh(botonGeo, amarillo);
+    const boton3 = new THREE.Mesh(botonGeo, amarillo);
+
+    boton1.position.set(0, 6.8, 2);
+    boton2.position.set(0, 5.2, 2);
+    boton3.position.set(0, 3.6, 2);
+
+    // --- HOMBRERAS ---
+    const hombroGeo = new THREE.SphereGeometry(1, 12, 12);
+    const hombroIzq = new THREE.Mesh(hombroGeo, amarillo);
+    const hombroDer = new THREE.Mesh(hombroGeo, amarillo);
+    hombroIzq.position.set(-2.5, 7, 0);
+    hombroDer.position.set(2.5, 7, 0);
+
+    // --- BRAZOS ---
+    const brazoGeo = new THREE.CylinderGeometry(0.5, 0.5, 3.5, 12);
+    const brazoIzq = new THREE.Mesh(brazoGeo, azulRey);
+    const brazoDer = new THREE.Mesh(brazoGeo, azulRey);
+    brazoIzq.position.set(-2.5, 5.5, 0);
+    brazoDer.position.set(2.5, 5.5, 0);
+
+    // --- GUANTES ---
+    const manoGeo = new THREE.SphereGeometry(0.7, 12, 12);
+    const manoIzq = new THREE.Mesh(manoGeo, blanco);
+    const manoDer = new THREE.Mesh(manoGeo, blanco);
+    manoIzq.position.set(0, -1.8, 0);
+    manoDer.position.set(0, -1.8, 0);
+    brazoIzq.add(manoIzq);
+    brazoDer.add(manoDer);
+
+    // --- PIERNA ---
+    const piernaGeo = new THREE.CylinderGeometry(0.8, 0.8, 3.5, 12);
+    const piernaIzq = new THREE.Mesh(piernaGeo, azulRey);
+    const piernaDer = new THREE.Mesh(piernaGeo, azulRey);
+    piernaIzq.position.set(-1, 2.5, 0);
+    piernaDer.position.set(1, 2.5, 0);
+
+    // --- BOTAS ---
+    const botaGeo = new THREE.BoxGeometry(1.8, 1, 2.5);
+    const botaIzq = new THREE.Mesh(botaGeo, negro);
+    const botaDer = new THREE.Mesh(botaGeo, negro);
+    botaIzq.position.set(-1, 1, 0.6);
+    botaDer.position.set(1, 1, 0.6);
+
+    // --- GRUPO FINAL ---
+    const cascanueces = new THREE.Group();
+    cascanueces.add(
+        cabeza, barba, nariz, ojoIzq, ojoDer, boca,
+        casco, cinta, torso,
+        boton1, boton2, boton3,
+        hombroIzq, hombroDer,
+        brazoIzq, brazoDer,
+        piernaIzq, piernaDer,
+        botaIzq, botaDer,
+        bigoteIzq,bigoteDer
+    );
+
+    cascanueces.position.set(x, y, z);
+
+    return cascanueces;
+}
+// AFREGAR A LA ESCENA
+const miCascanueces= Cascanueces({ x: 5, y: 0, z: -5 });
+scene.add(miCascanueces);
+miCascanueces.scale.set(0.5, 0.5, 0.5);
+
+//              CARRUSEL 
+
+function Carrusel({ x, y, z }) {
+
+    const CarruselGroup = new THREE.Group();
+
+    // Base (Cilindro grande y plano)
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(8, 8, 0.5, 8), new THREE.MeshLambertMaterial({ color: 0xADD8E6 })); // Azul Claro
+    base.position.set(0, 0.25, 0);
+    CarruselGroup.add(base);
+
+    // Techo (Cono)
+    const techo = new THREE.Mesh(new THREE.ConeGeometry(9, 3, 8), new THREE.MeshLambertMaterial({ color: 0xADD8E6 })); // Azul Claro
+    techo.position.set(0, 8, 0);
+    CarruselGroup.add(techo);
+
+    // Soporte Central (Cilindro alto)
+    const centro = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 8, 8), new THREE.MeshLambertMaterial({ color: 0xFFD700 })); // Dorado
+    centro.position.set(0, 4.5, 0);
+    CarruselGroup.add(centro);
+
+    // Columna 1
+    const columna1 = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 7, 4), new THREE.MeshLambertMaterial({ color: 0xFFD700 })); // Dorado
+    columna1.position.set(7, 4, 0);
+    CarruselGroup.add(columna1);
+
+    // Columna 2
+    const columna2 = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 7, 4), new THREE.MeshLambertMaterial({ color: 0xFFD700 })); // Dorado
+    columna2.position.set(-7, 4, 0);
+    CarruselGroup.add(columna2);
+
+    // Columna 3
+    const columna3 = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 7, 4), new THREE.MeshLambertMaterial({ color: 0xFFD700 })); // Dorado
+    columna3.position.set(0, 4, 7);
+    CarruselGroup.add(columna3);
+
+    // Columna 4
+    const columna4 = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 7, 4), new THREE.MeshLambertMaterial({ color: 0xFFD700 })); // Dorado
+    columna4.position.set(0, 4, -7);
+    CarruselGroup.add(columna4);
+
+    // Caballo 1 (Verde)
+    const CaballoGroup1 = new THREE.Group();
+    const cuerpo1 = new THREE.Mesh(new THREE.BoxGeometry(2, 1, 0.5), new THREE.MeshLambertMaterial({ color: 0x008000 })); // Verde Oscuro
+    cuerpo1.position.set(0, 1.5, 0);
+    CaballoGroup1.add(cuerpo1);
+    const cuello1 = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1, 0.5), new THREE.MeshLambertMaterial({ color: 0x008000 })); // Verde Oscuro
+    cuello1.position.set(0.8, 2, 0);
+    CaballoGroup1.add(cuello1);
+    const cabeza1 = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.5, 0.5), new THREE.MeshLambertMaterial({ color: 0x8B4513 })); // Marrón (Madera)
+    cabeza1.position.set(1.2, 2.3, 0);
+    CaballoGroup1.add(cabeza1);
+    const poste1 = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 4, 4), new THREE.MeshLambertMaterial({ color: 0xFFD700 })); // Dorado
+    poste1.position.set(0, 2, 0);
+    CaballoGroup1.add(poste1);
+    CaballoGroup1.position.set(4, 0, 0);
+    CarruselGroup.add(CaballoGroup1);
+    
+    // Caballo 2 (Verde)
+    const CaballoGroup2 = new THREE.Group();
+    const cuerpo2 = new THREE.Mesh(new THREE.BoxGeometry(2, 1, 0.5), new THREE.MeshLambertMaterial({ color: 0x008000 })); // Verde Oscuro
+    cuerpo2.position.set(0, 1.5, 0);
+    CaballoGroup2.add(cuerpo2);
+    const cuello2 = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1, 0.5), new THREE.MeshLambertMaterial({ color: 0x008000 })); // Verde Oscuro
+    cuello2.position.set(0.8, 2, 0);
+    CaballoGroup2.add(cuello2);
+    const cabeza2 = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.5, 0.5), new THREE.MeshLambertMaterial({ color: 0x8B4513 })); // Marrón (Madera)
+    cabeza2.position.set(1.2, 2.3, 0);
+    CaballoGroup2.add(cabeza2);
+    const poste2 = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 4, 4), new THREE.MeshLambertMaterial({ color: 0xFFD700 })); // Dorado
+    poste2.position.set(0, 2, 0);
+    CaballoGroup2.add(poste2);
+    CaballoGroup2.position.set(-4, 0, 0);
+    CarruselGroup.add(CaballoGroup2);
+
+    // Caballo 3 (Rojo)
+    const CaballoGroup3 = new THREE.Group();
+    const cuerpo3 = new THREE.Mesh(new THREE.BoxGeometry(2, 1, 0.5), new THREE.MeshLambertMaterial({ color: 0xCC0000 })); // Rojo
+    cuerpo3.position.set(0, 1.5, 0);
+    CaballoGroup3.add(cuerpo3);
+    const cuello3 = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1, 0.5), new THREE.MeshLambertMaterial({ color: 0xCC0000 })); // Rojo
+    cuello3.position.set(0.8, 2, 0);
+    CaballoGroup3.add(cuello3);
+    const cabeza3 = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.5, 0.5), new THREE.MeshLambertMaterial({ color: 0xFFFFFF })); // Blanco
+    cabeza3.position.set(1.2, 2.3, 0);
+    CaballoGroup3.add(cabeza3);
+    const poste3 = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 4, 4), new THREE.MeshLambertMaterial({ color: 0xFFD700 })); // Dorado
+    poste3.position.set(0, 2, 0);
+    CaballoGroup3.add(poste3);
+    CaballoGroup3.position.set(0, 0, 4); 
+    CarruselGroup.add(CaballoGroup3);
+
+    // Caballo 4 (Rojo)
+    const CaballoGroup4 = new THREE.Group();
+    const cuerpo4 = new THREE.Mesh(new THREE.BoxGeometry(2, 1, 0.5), new THREE.MeshLambertMaterial({ color: 0xCC0000 })); // Rojo
+    cuerpo4.position.set(0, 1.5, 0);
+    CaballoGroup4.add(cuerpo4);
+    const cuello4 = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1, 0.5), new THREE.MeshLambertMaterial({ color: 0xCC0000 })); // Rojo
+    cuello4.position.set(0.8, 2, 0);
+    CaballoGroup4.add(cuello4);
+    const cabeza4 = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.5, 0.5), new THREE.MeshLambertMaterial({ color: 0xFFFFFF })); // Blanco
+    cabeza4.position.set(1.2, 2.3, 0);
+    CaballoGroup4.add(cabeza4);
+    const poste4 = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 4, 4), new THREE.MeshLambertMaterial({ color: 0xFFD700 })); // Dorado
+    poste4.position.set(0, 2, 0);
+    CaballoGroup4.add(poste4);
+    CaballoGroup4.position.set(0, 0, -4); 
+    CarruselGroup.add(CaballoGroup4);
+
+
+    CarruselGroup.position.set(x, y, z);
+    return CarruselGroup;
+}
+
+// AGREGAR A LA ESCENA
+const miCarrusel = Carrusel({ x: -11, y: 0, z: -15 });
+scene.add(miCarrusel);
+miCarrusel.scale.set(0.8, 0.8, 0.8);
+
+// RENDER LOOP 
+function render(){
+  renderer.render(scene, camera);
+  requestAnimationFrame(render);
+}
+renderer.setAnimationLoop(render);
+ 
+</script>
+</body>
+</html>
